@@ -9,7 +9,7 @@ import org.neo4j.graphdb.Label;
 import java.io.File;
 
 public class Main {
-
+    /*
     static Node lorry, food, delivery;
 
     private static void populateDatabse(GraphDatabaseService db) {
@@ -22,16 +22,16 @@ public class Main {
         food = db.createNode();
         food.setProperty("name", "onion");
         food.setProperty("count", 5);
-        food.addLabel("");
+       // food.addLabel("");
 
         delivery = db.createNode();
-        delivery.
+       // delivery.
 
-    }
+    }*/
 
     public static void main(String[] args) {
 
-        GraphDatabaseService db = new GraphDatabaseFactory()
+       /** GraphDatabaseService db = new GraphDatabaseFactory()
                 .newEmbeddedDatabase(new File("MyNeo4jDB"));
 
 
@@ -41,14 +41,13 @@ public class Main {
         actor.setProperty("year", 1964);
         actor.addLabel(Label.label("actor"));
 
-        actor.createRelationshipTo(actor2, MyTypes.KNOWS);
+       // actor.createRelationshipTo(actor2, MyTypes.KNOWS);
 
         db.shutdown();
+        **/
 
+        System.out.println("hojda");
     }
 
-    private static enum MyTypes implements RelationshipType {
-        KNOWS
-    }
 
 }
