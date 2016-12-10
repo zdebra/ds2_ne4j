@@ -10,6 +10,7 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 public class Main {
 
@@ -88,6 +89,21 @@ public class Main {
                 System.out.println(p.endNode().getProperty("name") + ", " + p.endNode().getProperty("count"));
             }
 
+            // finds all vegetables with count > 100
+            Result r1 = db.execute("MATCH (f:food) WHERE f.count > 100 RETURN f");
+            while (r1.hasNext()) {
+                Map<String, Object> row = r1.next();
+                Node f = (Node) row.get("f");
+                System.out.println("name: "+f.getProperty("name") + ", count: " + f.getProperty("count"));
+            }
+
+
+            // finds all food lorry is delivering
+            Result r2 = db.execute("MATCH (l:lorry {driver:'vytick'})-->(d:delivery)-->(f:food) RETURN l.driver AS driver, f.name AS name");
+            while (r2.hasNext()) {
+                Map<String, Object> row = r2.next();
+                System.out.println("driver: "+row.get("driver") + ", food: " + row.get("name"));
+            }
 
             tx.success();
         } catch (Exception e) {
