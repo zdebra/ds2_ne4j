@@ -10,6 +10,8 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 
 public class Main {
@@ -45,10 +47,10 @@ public class Main {
             food[9] = databasePopulator.addFood("bean", 398);
             food[10] = databasePopulator.addFood("broccoli", 42);
 
-            delivery[0] = databasePopulator.addDelivery("1.5.2017", "Some 123, Praha 6, 16000");
-            delivery[1] = databasePopulator.addDelivery("4.1.2017", "Think 1223, Praha 6, 16000");
-            delivery[2] = databasePopulator.addDelivery("10.3.2017", "Else 123, Praha 6, 16000");
-            delivery[3] = databasePopulator.addDelivery("12.3.2017", "Different 123, Praha 6, 16000");
+            delivery[0] = databasePopulator.addDelivery(1498867200, "Some 123, Praha 6, 16000");
+            delivery[1] = databasePopulator.addDelivery(1501545600, "Think 1223, Praha 6, 16000");
+            delivery[2] = databasePopulator.addDelivery(1504224000, "Else 123, Praha 6, 16000");
+            delivery[3] = databasePopulator.addDelivery(1506816000, "Different 123, Praha 6, 16000");
 
             delivery[0].createRelationshipTo(food[0], MyType.CONTAINS);
             delivery[0].createRelationshipTo(food[1], MyType.CONTAINS);
@@ -97,12 +99,33 @@ public class Main {
                 System.out.println("name: "+f.getProperty("name") + ", count: " + f.getProperty("count"));
             }
 
-
             // finds all food lorry is delivering
             Result r2 = db.execute("MATCH (l:lorry {driver:'vytick'})-->(d:delivery)-->(f:food) RETURN l.driver AS driver, f.name AS name");
             while (r2.hasNext()) {
                 Map<String, Object> row = r2.next();
                 System.out.println("driver: "+row.get("driver") + ", food: " + row.get("name"));
+            }
+
+            // find all drivers who are delivering onion
+            Result r3 = db.execute("MATCH (l:lorry)-->(d:delivery)-->(f:food {name:'onion'}) RETURN l.driver AS driver, f.name AS name");
+            while (r3.hasNext()) {
+                Map<String, Object> row = r3.next();
+                System.out.println("driver: "+row.get("driver") + ", food: " + row.get("name"));
+            }
+
+            // print how much avocado each driver is delivering
+            Result r4 = db.execute("MATCH (l:lorry)-->(d:delivery) OPTIONAL MATCH (d)-->(f:food {name:'avocado'}) RETURN l.driver AS driver, f.count as count");
+            while (r4.hasNext()) {
+                Map<String, Object> row = r4.next();
+                System.out.println("driver: "+row.get("driver") + ", avocados: " + row.get("count"));
+            }
+
+            // order all lorries based on their package delivery date
+            Result r5 = db.execute("MATCH (d:delivery)<-[:DELIVERS]-(l:lorry) RETURN d.deliverUntil AS deliverUntil, l.spz AS spz ORDER BY deliverUntil");
+            while (r5.hasNext()) {
+                Map<String, Object> row = r5.next();
+                Date date = Date.from( Instant.ofEpochSecond((Long) row.get("deliverUntil")) );
+                System.out.println("lorry: "+row.get("spz") + ", deliverDate: " + date.toString());
             }
 
             tx.success();
@@ -112,6 +135,7 @@ public class Main {
         } finally {
             tx.close();
         }
+
 
 
 

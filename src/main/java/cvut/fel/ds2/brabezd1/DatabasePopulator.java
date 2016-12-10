@@ -38,7 +38,7 @@ public class DatabasePopulator {
 
     }
 
-    public Node addDelivery(String deliverUntil, String address) {
+    public Node addDelivery(long deliverUntil, String address) {
 
         Node node = db.createNode();
         SimpleDateFormat sdf = new SimpleDateFormat("d.M.yyyy");
