@@ -63,23 +63,36 @@ public class Main {
 
             lorry[0].createRelationshipTo(delivery[0], MyType.DELIVERS);
             lorry[1].createRelationshipTo(delivery[1], MyType.DELIVERS);
-            lorry[2].createRelationshipTo(delivery[2], MyType.DELIVERS);
+            lorry[1].createRelationshipTo(delivery[2], MyType.DELIVERS);
             lorry[3].createRelationshipTo(delivery[3], MyType.DELIVERS);
 
-            TraversalDescription td = db.traversalDescription()
+            // retrieve to which addresses lorry delivering
+            TraversalDescription deliveryAdressesOfLorry = db.traversalDescription()
                     .breadthFirst()
                     .relationships(MyType.DELIVERS, Direction.BOTH)
                     .evaluator(Evaluators.excludeStartPosition())
                     .uniqueness(Uniqueness.NODE_GLOBAL);
-            Traverser t = td.traverse(lorry[0]);
+            Traverser t = deliveryAdressesOfLorry.traverse(lorry[1]);
             for (Path p : t) {
                 System.out.println(p.endNode().getProperty("address"));
             }
 
+            // retrieve what delivery contains
+            TraversalDescription foodsInPackage = db.traversalDescription()
+                    .breadthFirst()
+                    .relationships(MyType.CONTAINS, Direction.BOTH)
+                    .evaluator(Evaluators.excludeStartPosition())
+                    .uniqueness(Uniqueness.NODE_GLOBAL);
+            Traverser t2 = foodsInPackage.traverse(delivery[3]);
+            for (Path p : t2) {
+                System.out.println(p.endNode().getProperty("name") + ", " + p.endNode().getProperty("count"));
+            }
+
+
             tx.success();
         } catch (Exception e) {
             tx.failure();
-            System.err.println(e.getStackTrace());
+            System.err.println(e.getMessage());
         } finally {
             tx.close();
         }
